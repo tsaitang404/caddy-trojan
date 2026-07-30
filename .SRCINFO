@@ -1,0 +1,30 @@
+pkgbase = caddy-trojan
+	pkgdesc = Fast web server with automatic HTTPS and trojan proxy support
+	pkgver = 2.11.4
+	pkgrel = 1
+	url = https://caddyserver.com
+	arch = x86_64
+	arch = aarch64
+	license = Apache-2.0
+	license = GPL-3.0-only
+	makedepends = go
+	makedepends = xcaddy
+	depends = glibc
+	provides = caddy=2.11.4
+	conflicts = caddy
+	conflicts = caddy-naiveproxy-trojan
+	conflicts = caddy-trojan-imgk
+	backup = etc/caddy/Caddyfile
+	source = caddy-trojan.service
+	source = caddy.hook
+	source = Caddyfile::https://raw.githubusercontent.com/caddyserver/dist/v2.11.4/config/Caddyfile
+	source = index.html::https://raw.githubusercontent.com/caddyserver/dist/v2.11.4/welcome/index.html
+	source = caddy-api.service::https://raw.githubusercontent.com/caddyserver/dist/v2.11.4/init/caddy-api.service
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+
+pkgname = caddy-trojan

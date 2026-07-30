@@ -1,0 +1,9 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = caddy-trojan
+
+[Action]
+Description = Restarting Caddy after upgrade...
+When = PostTransaction
+Exec = /usr/bin/systemctl try-restart caddy.service
