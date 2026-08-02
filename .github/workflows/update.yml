@@ -22,8 +22,12 @@ jobs:
         run: |
           pacman -Syu --noconfirm --needed \
             base-devel git go namcap
-          # xcaddy is in AUR, not official repos; install via go install to /usr/local/bin
-          GO111MODULE=on GOBIN=/usr/local/bin go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+          # xcaddy is in archlinuxcn repo (not official); enable and install
+          echo "[archlinuxcn]" >> /etc/pacman.conf
+          echo "Server = https://mirrors.aliyun.com/archlinuxcn/\$arch" >> /etc/pacman.conf
+          pacman-key --init 2>/dev/null || true
+          pacman-key --populate archlinux 2>/dev/null || true
+          pacman -Syu --noconfirm --needed archlinuxcn-keyring xcaddy
           which xcaddy
 
       - name: Checkout repo
