@@ -21,7 +21,10 @@ jobs:
       - name: System dependencies
         run: |
           pacman -Syu --noconfirm --needed \
-            base-devel git go namcap xcaddy
+            base-devel git go namcap
+          # xcaddy is in AUR, not official repos; install via go install to /usr/local/bin
+          GO111MODULE=on GOBIN=/usr/local/bin go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+          which xcaddy
 
       - name: Checkout repo
         uses: actions/checkout@v4
