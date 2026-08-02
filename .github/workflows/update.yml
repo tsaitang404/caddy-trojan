@@ -25,9 +25,10 @@ jobs:
           # xcaddy is in archlinuxcn repo (not official); enable and install
           echo "[archlinuxcn]" >> /etc/pacman.conf
           echo "Server = https://mirrors.aliyun.com/archlinuxcn/\$arch" >> /etc/pacman.conf
-          pacman-key --init 2>/dev/null || true
-          pacman-key --populate archlinux 2>/dev/null || true
-          pacman -Syu --noconfirm --needed archlinuxcn-keyring xcaddy
+          pacman-key --init
+          pacman-key --populate archlinux
+          pacman -Syu --noconfirm --needed archlinuxcn-keyring
+          pacman -S --noconfirm --needed xcaddy
           which xcaddy
 
       - name: Checkout repo
