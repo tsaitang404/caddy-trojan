@@ -3,7 +3,7 @@
 
 pkgname=caddy-trojan
 pkgver=2.11.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Fast web server with automatic HTTPS and trojan proxy support'
 arch=('x86_64' 'aarch64')
 url='https://caddyserver.com'
@@ -25,7 +25,11 @@ sha256sums=('SKIP'
             'SKIP')
 
 check() {
-  "${srcdir}/caddy" version > /dev/null 2>&1
+  cd "${srcdir}"
+  # Verify the built binary runs correctly
+  ./caddy version > /dev/null 2>&1 || return 1
+  ./caddy validate --config /dev/null 2>/dev/null || true
+  echo "Binary verification passed"
 }
 
 build() {
