@@ -2,9 +2,8 @@ name: Check upstream and update PKGBUILD
 
 on:
   schedule:
-    # 每天检查一次新版本
     - cron: '0 8 * * *'
-  workflow_dispatch:  # 支持手动触发
+  workflow_dispatch:
   push:
     branches: [master, main]
 
@@ -21,14 +20,16 @@ jobs:
       - name: System dependencies
         run: |
           pacman -Syu --noconfirm --needed \
-            base-devel git go namcap
-          # xcaddy is in archlinuxcn repo (not official); enable and install
-          echo "[archlinuxcn]" >> /etc/pacman.conf
-          echo "Server = https://mirrors.aliyun.com/archlinuxcn/\$arch" >> /etc/pacman.conf
-          pacman-key --init
-          pacman-key --populate archlinux
-          pacman -Syu --noconfirm --needed archlinuxcn-keyring
-          pacman -S --noconfirm --needed xcaddy
+            base-devel git go
+          # Install xcaddy from AUR
+          useradd -m builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          su builder -c "
+            cd /tmp
+            git clone https://aur.archlinux.org/xcaddy.git
+            cd xcaddy
+            makepkg -si --noconfirm
+          "
           which xcaddy
 
       - name: Checkout repo
@@ -59,7 +60,6 @@ jobs:
           sed -i "s/^pkgver=$old$/pkgver=$new/" PKGBUILD
           sed -i "s/^pkgrel=.*$/pkgrel=1/" PKGBUILD
           
-          # Update version in .SRCINFO
           sed -i "s/^\\tpkgver = $old$/\\tpkgver = $new/" .SRCINFO
           
           echo "updated=true" >> $GITHUB_OUTPUT
@@ -68,7 +68,6 @@ jobs:
         if: steps.update.outputs.updated == 'true'
         run: |
           cd aur-repo
-          # Create non-root user for makepkg
           useradd -m builder
           chown -R builder:builder .
           su builder -c "makepkg -f --noconfirm" 2>&1 || true
