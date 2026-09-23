@@ -43,10 +43,27 @@ jobs:
           cd aur-repo
           current=$(grep -oP '^pkgver=\K.*' PKGBUILD)
           echo "current=$current" >> $GITHUB_OUTPUT
-          
-          latest=$(curl -sL https://api.github.com/repos/caddyserver/caddy/releases/latest | grep -oP '"tag_name": "v\K[^"]+')
+
+          # 带重试和错误处理的版本查询
+          latest=""
+          for i in 1 2 3; do
+            response=$(curl -sL --fail --max-time 15 \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/caddyserver/caddy/releases/latest" 2>/dev/null) || true
+            latest=$(echo "$response" | grep -oP '"tag_name":\s*"v\K[^"]+' || true)
+            if [ -n "$latest" ]; then
+              break
+            fi
+            echo "Attempt $i failed, retrying in 3s..."
+            sleep 3
+          done
+
           echo "latest=$latest" >> $GITHUB_OUTPUT
-          echo "Current: $current, Latest: $latest"
+          echo "Current: $current, Latest: ${latest:-FAILED_TO_FETCH}"
+          if [ -z "$latest" ]; then
+            echo "::warning::Could not fetch latest Caddy version from GitHub API"
+          fi
 
       - name: Update PKGBUILD if needed
         id: update
