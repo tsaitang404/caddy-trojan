@@ -85,7 +85,8 @@ jobs:
         if: steps.update.outputs.updated == 'true'
         run: |
           cd aur-repo
-          useradd -m builder
+          # user 在 System dependencies 步骤已创建；sh -e 下重复 useradd 返回 9 会中止整个步骤
+          id -u builder >/dev/null 2>&1 || useradd -m builder
           chown -R builder:builder .
           su builder -c "makepkg -f --noconfirm" 2>&1 || true
           namcap PKGBUILD || true
