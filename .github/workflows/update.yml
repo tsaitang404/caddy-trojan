@@ -20,7 +20,10 @@ jobs:
       - name: System dependencies
         run: |
           pacman -Syu --noconfirm --needed \
-            base-devel git go
+            base-devel git go namcap
+          # build 步会 chown -R 给 builder；root 后续 git 操作需豁免 safe.directory，
+          # 否则 commit 步报 "fatal: not in a git directory" (exit 128)
+          git config --global --add safe.directory '*'
           # Install xcaddy from AUR
           useradd -m builder
           echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -78,6 +81,8 @@ jobs:
           sed -i "s/^pkgrel=.*$/pkgrel=1/" PKGBUILD
           
           sed -i "s/^\\tpkgver = $old$/\\tpkgver = $new/" .SRCINFO
+          # pkgrel 归 1 时 .SRCINFO 也要同步，否则 AUR 元数据与 PKGBUILD 不一致
+          sed -i "s/^\\tpkgrel = .*/\\tpkgrel = 1/" .SRCINFO
           
           echo "updated=true" >> $GITHUB_OUTPUT
 
