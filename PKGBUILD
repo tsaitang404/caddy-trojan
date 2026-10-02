@@ -2,8 +2,8 @@
 # Contributor: Based on AUR caddy-trojan
 
 pkgname=caddy-trojan
-pkgver=2.11.4
-pkgrel=2
+pkgver=2.11.6
+pkgrel=1
 pkgdesc='Fast web server with automatic HTTPS and trojan proxy support'
 arch=('x86_64' 'aarch64')
 url='https://caddyserver.com'
